@@ -1,0 +1,309 @@
+Project's name :car   Application's name :blog
+
+PS B:\Django Darsman LessonS With Pics\crash course> py -m venv venv
+PS B:\Django Darsman LessonS With Pics\crash course> venv/scripts/activate
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> pip install django
+
+#VERY CRUCIAL Moment:
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> django-admin startproject car .
+
+
+
+>python.exe -m pip install --upgrade pip
+>py manage.py runserver
+manage.py interact with django
+db.sqlite3:our servevr
+
+add in
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR,'template'],<======!!!connect template to our BASE_DIR
+        'APP_DIRS': True,....
+
+To make a  new application we should go inside main Folder:CRASH COURSE
+
+python.manage py startapp blog
+
+After creating a  simple path from the main project to our app and connect URLs to the view were gonna make
+a  database :
+
+
+
+in our Application :blog.models.py
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=155)
+    content = models.TextField()
+    slug = models.SlugField(max_length=255)
+
+
+    def __str__(self):
+        return self.title
+
+
+
+if we makemigrations we will see not  changes cuz we have not  registered our app yet:
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py makemigrations
+No changes detected
+
+
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',<==
+]
+
+
+
+py manage.py makemigrations
+
+
+
+
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py makemigrations
+Migrations for 'blog':
+  blog\migrations\0001_initial.py
+    - Create model Post
+(venv) PS B:\Django Darsman LessonS With Pics\crash course>
+
+
+
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py migrate
+DONE!Table and db created
+
+
+install  sqlite:
+
+at the button of our vs we can find  SQLITE EXPLORER  , right click open and see our data :
+
+#Go to Admin Pannel:
+
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py createsuperuser
+
+
+Email address: maxjokar@gmail.com
+Password:
+Password (again):
+yet
+
+after you open admin :you'll see  your Panel:http://127.0.0.1:8000/admin/auth/user/
+
+#By default Django doesnt put your table you created inside  our admin so you must need to REGISTER:
+To do that we shout use the admin.py
+
+
+
+admin.py
+from django.contrib import admin
+
+from . import models
+
+admin.site.register(models.Post)
+
+refresh :
+http://127.0.0.1:8000/admin/auth/user/
+
+youll see the BLOG:Posts
+
+
+
+in Admin panel. add several Posts with slug : slug firs-post
+now we go to our view:in our view sticks all together
+from .models import Post
+
+
+views.py
+
+def home(request):
+    data = Post.objects.all() # we wanna collect all the  data
+    return render(request, "index.html",{"posts":data})
+
+
+
+
+in our index.html
+{% for post in posts %}
+<p>{{post.title}}  </p>
+<p>{{post.content}}  </p>
+
+{% endfor %}
+
+
+
+
+
+
+
+
+
+http://127.0.0.1:8000/home/
+we will see the data we inserted in our Admin panel but in our view
+
+
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+
+getbootstarap.com
+in Examples:
+
+
+
+we add image in our model.py
+create a folder name media , images and copy a file with defualt
+
+
+
+
+install Pillow:is a package help us manage images within our Django application
+>pip install pillow
+
+since we add image to our model , we should makemigrations and migrate again :
+
+
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py makemigrations
+Migrations for 'blog':
+  blog\migrations\0002_post_image.py
+    - Add field image to post
+
+
+(venv) PS B:\Django Darsman LessonS With Pics\crash course> py manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, blog, contenttypes, sessions
+Running migrations:
+
+
+
+
+remove in our index:
+<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="h
+
+
+
+we need to make a path to our fotos  so in our projects urls
+urls.py we write Below:
+
+
+
+from django.contrib import admin
+from django.urls import path , include
+
+from django.conf import settings<==================
+from django.cong.urls.static import static <=====================a new varibale or elemeant in our settings
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('' , include('blog.urls'))# '' we use root directory
+
+]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)<=======
+
+Media URl is utilised by the brower to find the images , media root is used by Django to  save the files in
+the correct foto
+
+
+
+setting.py
+
+
+STATIC_URL = '/static/'
+
+
+MEDIA_URL = "medeia/"==>uses by the websites
+MEDIA_ROOT = BASE_DIR / 'media'==>a path uses by the Django , we can find the foto and put the images
+
+
+
+
+in blog application
+urls.py
+from django.contrib import admin
+from django.urls import path , include
+from . import views
+
+urlpatterns = [
+
+    path('', views.home , name="homepage"),
+    path('electric/<slug:slug>', views.electric , name="electric"),
+
+]
+
+
+
+we have a  template
+electric.html
+{{post.title}}
+
+
+
+view.py
+def electric(request , slug):
+    # we wanna collect specific/one item /field name from  data
+    data = Post.objects.get(slug=slug)
+    return render(request, "electric.html",{"post":data})
+
+
+http://127.0.0.1:8000/electric/first-post
+
+
+we get :individual item from the data base
+First Post
+which is posted from our admin !
+
+
+
+how we can make links:
+
+To construct the URLS in model we make , base upon the info we provide :
+
+in index we change:
+<button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+<button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+
+to <a type="button:................
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
